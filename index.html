@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="es" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Web premium para Carraco, creador de contenido, eventos, comunidad y redes sociales." />
+    <title>Carraco | Comunidad, eventos y contenido</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            animation: {
+              float: 'float 6s ease-in-out infinite',
+              pulseSlow: 'pulse 4s ease-in-out infinite',
+            },
+            keyframes: {
+              float: {
+                '0%, 100%': { transform: 'translateY(0px)' },
+                '50%': { transform: 'translateY(-10px)' },
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='6' fill='rgba(34,211,238,0.95)'/%3E%3C/svg%3E"), auto;
+      }
+      ::selection { background: rgba(34,211,238,0.35); }
+      .glass { backdrop-filter: blur(18px); }
+    </style>
+  </head>
+  <body class="bg-slate-950 text-slate-100 transition-colors duration-500">
+    <div id="root"></div>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+      const { useEffect, useMemo, useState } = React;
+
+      const socialLinks = [
+        { name: 'YouTube', handle: '@carraco', emoji: '▶️', url: 'https://youtube.com' },
+        { name: 'Instagram', handle: '@carraco', emoji: '📸', url: 'https://instagram.com' },
+        { name: 'TikTok', handle: '@carraco', emoji: '🎵', url: 'https://tiktok.com' },
+        { name: 'Discord', handle: 'Comunidad oficial', emoji: '💬', url: 'https://discord.com' },
+      ];
+
+      const highlights = ['Streaming en directo', 'Eventos exclusivos', 'Humor y retos', 'Comunidad activa', 'Giveaways', 'Colabs'];
+      const agenda = [
+        { date: '12 Ago', title: 'Live especial', time: '20:00', detail: 'Retos, música y sorpresas' },
+        { date: '22 Ago', title: 'Meet & greet', time: '18:30', detail: 'Charla con fans y fotos' },
+        { date: '02 Sep', title: 'Evento sorpresa', time: '21:00', detail: 'Premios y comunidad' },
+        { date: '14 Sep', title: 'Noche de collabs', time: '22:00', detail: 'Invitados y mini retos' },
+      ];
+      const gallery = ['Momento épico', 'Behind the scenes', 'Fan art', 'Colaboraciones', 'Reacciones', 'Música'];
+      const features = [
+        { title: 'Streaming', text: 'Tu mundo en directo con una estética que brilla.' },
+        { title: 'Eventos', text: 'Cada cita queda organizada y lista para compartir.' },
+        { title: 'Comunidad', text: 'Un lugar para que tus seguidores se sientan parte del proyecto.' },
+        { title: 'Merch', text: 'Tus productos, tus premios y tus momentos premium.' },
+      ];
+      const testimonials = [
+        { name: 'Alicia', quote: 'Se ve súper profesional y muy cómodo de navegar.' },
+        { name: 'Javi', quote: 'Me encanta la sensación de estar en una web de verdad.' },
+        { name: 'Marta', quote: 'Los eventos y las redes se ven mucho más claros.' },
+      ];
+      const faqItems = [
+        { q: '¿Se puede cambiar el contenido fácilmente?', a: 'Sí, todo está pensado para adaptarse a tus fechas y redes.' },
+        { q: '¿Funciona bien en móvil?', a: 'Sí, la web está preparada para verse bonita en cualquier pantalla.' },
+        { q: '¿Se puede conectar con Twitch?', a: 'Sí, con la URL del canal puedes mostrar el estado del directo sin API.' },
+      ];
+
+      function App() {
+        const [darkMode, setDarkMode] = useState(true);
+        const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+        const [liveConfig, setLiveConfig] = useState({ url: 'https://www.twitch.tv/twich_alecarrasco' });
+        const [liveStatus, setLiveStatus] = useState({
+          isLive: false,
+          title: 'Pulsa el botón para cambiar el estado del directo.',
+          url: 'https://www.twitch.tv/twich_alecarrasco',
+          loading: false,
+        });
+        const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        const [ownerPass, setOwnerPass] = useState('');
+        const [authMessage, setAuthMessage] = useState('');
+        const [isOwner, setIsOwner] = useState(false);
+
+        const saveLiveStatus = async (nextState) => {
+          const payload = {
+            ...nextState,
+            updatedAt: Date.now(),
+          };
+
+          try {
+            const response = await fetch('/api/live', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                password: 'carraco2026',
+                ...payload,
+              }),
+            });
+            const serverState = await response.json();
+            if (!response.ok) {
+              throw new Error(serverState.error || 'No se pudo guardar el estado.');
+            }
+            setLiveStatus(serverState);
+            window.localStorage.setItem('carraco-live-status', JSON.stringify(serverState));
+          } catch (error) {
+            setLiveStatus(payload);
+            window.localStorage.setItem('carraco-live-status', JSON.stringify(payload));
+          }
+        };
+
+        const toggleLiveStatus = () => {
+          if (!isOwner) {
+            setAuthMessage('Solo el propietario puede cambiar este estado.');
+            return;
+          }
+
+          const nextState = {
+            isLive: !liveStatus.isLive,
+            title: liveStatus.isLive ? 'No hay directo activo en este momento.' : '¡Ahora mismo está en directo!',
+            url: liveConfig.url || 'https://www.twitch.tv/twich_alecarrasco',
+            loading: false,
+          };
+          saveLiveStatus(nextState);
+          setAuthMessage('Estado actualizado correctamente.');
+        };
+
+        const unlockOwner = () => {
+          const correctPassword = 'carraco2026';
+          if (ownerPass === correctPassword) {
+            setIsOwner(true);
+            setAuthMessage('Acceso permitido.');
+          } else {
+            setIsOwner(false);
+            setAuthMessage('Contraseña incorrecta.');
+          }
+        };
+
+        useEffect(() => {
+          document.documentElement.classList.toggle('dark', darkMode);
+          document.body.classList.toggle('bg-slate-950', darkMode);
+          document.body.classList.toggle('text-slate-100', darkMode);
+          document.body.classList.toggle('bg-slate-50', !darkMode);
+          document.body.classList.toggle('text-slate-900', !darkMode);
+        }, [darkMode]);
+
+        useEffect(() => {
+          const onMove = (event) => setCursorPosition({ x: event.clientX, y: event.clientY });
+          window.addEventListener('pointermove', onMove);
+          return () => window.removeEventListener('pointermove', onMove);
+        }, []);
+
+        useEffect(() => {
+          const savedConfig = window.localStorage.getItem('carraco-live-config');
+          if (savedConfig) {
+            try {
+              setLiveConfig(JSON.parse(savedConfig));
+            } catch (error) {
+              console.warn('No se pudo cargar la configuración de directo.', error);
+            }
+          }
+
+          const savedStatus = window.localStorage.getItem('carraco-live-status');
+          if (savedStatus) {
+            try {
+              setLiveStatus(JSON.parse(savedStatus));
+            } catch (error) {
+              console.warn('No se pudo cargar el estado de directo.', error);
+            }
+          }
+        }, []);
+
+        useEffect(() => {
+          const syncLiveStatus = async () => {
+            try {
+              const response = await fetch('/api/live');
+              const serverState = await response.json();
+              setLiveStatus(serverState);
+              window.localStorage.setItem('carraco-live-status', JSON.stringify(serverState));
+            } catch (error) {
+              console.warn('No se pudo sincronizar el estado de directo.', error);
+            }
+          };
+
+          syncLiveStatus();
+          window.addEventListener('focus', syncLiveStatus);
+          const interval = window.setInterval(syncLiveStatus, 15000);
+          return () => {
+            window.removeEventListener('focus', syncLiveStatus);
+            window.clearInterval(interval);
+          };
+        }, []);
+
+        useEffect(() => {
+          const target = new Date('2026-08-12T20:00:00');
+          const tick = () => {
+            const diff = target - new Date();
+            if (diff <= 0) {
+              setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+              return;
+            }
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / (1000 * 60)) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+            setCountdown({ days, hours, minutes, seconds });
+          };
+          tick();
+          const interval = setInterval(tick, 1000);
+          return () => clearInterval(interval);
+        }, []);
+
+        useEffect(() => {
+          window.localStorage.setItem('carraco-live-config', JSON.stringify(liveConfig));
+        }, [liveConfig]);
+
+        const overlayStyle = useMemo(() => ({
+          background: darkMode
+            ? `radial-gradient(circle at ${cursorPosition.x}px ${cursorPosition.y}px, rgba(255,255,255,0.16), transparent 26%)`
+            : `radial-gradient(circle at ${cursorPosition.x}px ${cursorPosition.y}px, rgba(34,211,238,0.16), transparent 26%)`,
+        }), [cursorPosition, darkMode]);
+
+        return (
+          <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.12),_transparent_30%),linear-gradient(135deg,_#020617,_#111827_55%,_#0f172a)] text-slate-100' : 'bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.14),_transparent_30%),linear-gradient(135deg,_#fdf2f8,_#f5f3ff_55%,_#ecfeff)] text-slate-900'}`}>
+            <div className="pointer-events-none fixed inset-0 z-0" style={overlayStyle} />
+            <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 lg:px-8">
+              <div>
+                <p className="text-sm uppercase tracking-[0.35em] text-cyan-500">Carraco</p>
+                <h1 className="text-2xl font-black sm:text-3xl">Tu universo, en una sola web</h1>
+              </div>
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                className={`rounded-full border px-4 py-2 text-sm font-semibold shadow-lg transition hover:-translate-y-1 ${darkMode ? 'border-slate-700 bg-slate-900/70' : 'border-slate-200 bg-white/80 text-slate-900'}`}
+              >
+                {darkMode ? '☀️ Día' : '🌙 Noche'}
+              </button>
+            </header>
+
+            <main className="mx-auto flex max-w-7xl flex-col gap-8 px-6 pb-16 lg:px-8">
+              <section className={`grid items-center gap-8 rounded-[2rem] border p-8 shadow-2xl glass lg:grid-cols-[1.05fr_0.95fr] lg:p-10 ${darkMode ? 'border-slate-800 bg-slate-900/60' : 'border-white/70 bg-white/70'}`}>
+                <div className="space-y-6">
+                  <span className="inline-block rounded-full bg-cyan-500/10 px-4 py-2 text-sm font-semibold text-cyan-600 dark:text-cyan-300">Creator • Eventos • Comunidad • Marca personal</span>
+                  <h2 className="text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">Una web mucho más grande, más premium y mucho más viva para Carraco.</h2>
+                  <p className={`max-w-2xl text-lg ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>Aquí se juntan tus redes, tus eventos, tus momentos, tus colaboraciones y tu comunidad en un espacio muy cuidado, con animaciones suaves y un diseño que se siente moderno desde el primer segundo.</p>
+                  <div className="flex flex-wrap gap-3">
+                    {highlights.map((item) => (
+                      <span key={item} className={`rounded-full border px-3 py-2 text-sm transition hover:-translate-y-1 ${darkMode ? 'border-cyan-400/30 bg-cyan-500/10' : 'border-cyan-400/30 bg-cyan-500/10'}`}>{item}</span>
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap gap-4">
+                    <a href="#social" className="rounded-full bg-slate-900 px-5 py-3 font-semibold text-white transition hover:-translate-y-1 hover:bg-cyan-500 dark:bg-cyan-500 dark:text-slate-950">Ver redes</a>
+                    <a href="#agenda" className={`rounded-full border px-5 py-3 font-semibold transition hover:-translate-y-1 ${darkMode ? 'border-slate-700' : 'border-slate-300'}`}>Ver calendario</a>
+                    <a href="#contact" className={`rounded-full border px-5 py-3 font-semibold transition hover:-translate-y-1 ${darkMode ? 'border-fuchsia-500/40 bg-fuchsia-500/10 text-fuchsia-300' : 'border-fuchsia-500/30 bg-fuchsia-500/10 text-fuchsia-700'}`}>Contactar</a>
+                  </div>
+                </div>
+
+                <div className="relative flex items-center justify-center">
+                  <div className="animate-float absolute h-48 w-48 rounded-full bg-cyan-400/30 blur-3xl" />
+                  <div className={`relative w-full max-w-lg rounded-[2rem] border p-6 shadow-2xl glass ${darkMode ? 'border-slate-800 bg-gradient-to-br from-cyan-500/20 via-fuchsia-500/15 to-amber-400/20' : 'border-white/70 bg-gradient-to-br from-cyan-500/20 via-fuchsia-500/15 to-amber-400/20'}`}>
+                    <div className="mb-4 flex items-center justify-between">
+                      <div>
+                        <p className={`text-sm uppercase tracking-[0.3em] ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Live ahora</p>
+                        <h3 className="text-xl font-bold">Estado de directo</h3>
+                      </div>
+                      <div className={`rounded-full px-3 py-1 text-sm font-semibold ${liveStatus.isLive ? 'bg-rose-500 text-white' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                        {liveStatus.isLive ? 'En directo' : 'No en directo'}
+                      </div>
+                    </div>
+                    <div className={`rounded-2xl border p-4 shadow-inner ${darkMode ? 'border-slate-700 bg-slate-950/90 text-slate-100' : 'border-white/70 bg-white/80 text-slate-900'}`}>
+                      <p className="text-sm text-slate-400">Última comprobación</p>
+                      <p className="mt-2 text-2xl font-black">{liveStatus.isLive ? 'En directo' : 'No en directo'}</p>
+                      <p className="mt-2 text-sm text-slate-300">{liveStatus.title}</p>
+                      <div className="mt-4 grid gap-2">
+                        <input
+                          value={liveConfig.url}
+                          onChange={(event) => setLiveConfig((prev) => ({ ...prev, url: event.target.value }))}
+                          placeholder="URL del canal de Twitch"
+                          className={`rounded-2xl border px-3 py-2 text-sm ${darkMode ? 'border-slate-700 bg-slate-900 text-slate-100' : 'border-slate-200 bg-white text-slate-900'}`}
+                        />
+                        {!isOwner ? (
+                          <div className="grid gap-2">
+                            <input
+                              value={ownerPass}
+                              onChange={(event) => setOwnerPass(event.target.value)}
+                              type="password"
+                              placeholder="Contraseña de acceso"
+                              className={`rounded-2xl border px-3 py-2 text-sm ${darkMode ? 'border-slate-700 bg-slate-900 text-slate-100' : 'border-slate-200 bg-white text-slate-900'}`}
+                            />
+                            <button
+                              onClick={unlockOwner}
+                              className="rounded-full bg-fuchsia-500 px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-1"
+                            >
+                              Acceder como propietario
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={toggleLiveStatus}
+                            className="rounded-full bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:-translate-y-1"
+                          >
+                            {liveStatus.isLive ? 'Marcar como offline' : 'Marcar como en directo'}
+                          </button>
+                        )}
+                        {authMessage ? <p className="text-xs text-slate-400">{authMessage}</p> : null}
+                      </div>
+                      <a href={liveStatus.url} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-full bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:-translate-y-1">Abrir canal</a>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section className="grid gap-4 md:grid-cols-4">
+                {['+20k', '4 eventos', '100% premium', '24/7 comunidad'].map((item, index) => (
+                  <div key={item} className={`rounded-[1.5rem] border p-5 text-center shadow-lg transition hover:-translate-y-1 ${darkMode ? 'border-slate-800 bg-slate-900/60' : 'border-white/70 bg-white/70'}`}>
+                    <p className="text-2xl font-black">{item}</p>
+                    <p className={`mt-1 text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Métrica {index + 1}</p>
+                  </div>
+                ))}
+              </section>
+
+              <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+                <div className={`rounded-[2rem] border p-6 shadow-xl glass ${darkMode ? 'border-slate-800 bg-slate-900/60' : 'border-white/70 bg-white/70'}`}>
+                  <p className="text-sm uppercase tracking-[0.3em] text-cyan-500">Sobre Carraco</p>
+                  <h3 className="mt-3 text-2xl font-black">Más que una cuenta: una marca con personalidad.</h3>
+                  <p className={`mt-4 text-base leading-8 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>Esta web está pensada para que la gente lo vea como un universo completo: entretenimiento, ritmo, comunidad, eventos, premios y un estilo propio que se nota desde el primer clic.</p>
+                  <div className="mt-6 grid gap-3">
+                    {features.map((item) => (
+                      <div key={item.title} className={`rounded-2xl border p-4 ${darkMode ? 'border-slate-800 bg-slate-800/70' : 'border-slate-200 bg-slate-50/80'}`}>
+                        <p className="font-semibold">{item.title}</p>
+                        <p className={`mt-1 text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>{item.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className={`rounded-[2rem] border p-6 shadow-xl glass ${darkMode ? 'border-slate-800 bg-gradient-to-br from-cyan-500/15 via-slate-900/60 to-fuchsia-500/15' : 'border-white/70 bg-gradient-to-br from-cyan-500/15 via-white/70 to-fuchsia-500/15'}`}>
+                  <p className="text-sm uppercase tracking-[0.3em] text-fuchsia-500">Cuenta atrás</p>
+                  <h3 className="mt-3 text-2xl font-black">Próximo gran momento</h3>
+                  <div className="mt-6 grid gap-3 sm:grid-cols-4">
+                    {Object.entries(countdown).map(([key, value]) => (
+                      <div key={key} className={`rounded-2xl border p-4 text-center ${darkMode ? 'border-slate-700 bg-slate-900/70' : 'border-white/70 bg-white/80'}`}>
+                        <p className="text-2xl font-black">{value}</p>
+                        <p className={`text-sm uppercase ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>{key}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <p className={`mt-5 text-sm leading-7 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>Este contador se puede cambiar por el siguiente evento real y queda muy bien para generar expectación.</p>
+                </div>
+              </section>
+
+              <section id="social" className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
+                <div className={`rounded-[2rem] border p-6 shadow-xl glass ${darkMode ? 'border-slate-800 bg-slate-900/60' : 'border-white/70 bg-white/70'}`}>
+                  <p className="text-sm uppercase tracking-[0.3em] text-cyan-500">Redes</p>
+                  <h3 className="mt-3 text-2xl font-black">Conecta con Carraco</h3>
+                  <p className={`mt-3 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>Todas las redes en un mismo lugar, con un diseño más premium, más limpio y mucho más vivo.</p>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {socialLinks.map((link, index) => (
+                    <a key={link.name} href={link.url} target="_blank" rel="noreferrer" className={`group rounded-[1.5rem] border p-5 shadow-lg transition hover:-translate-y-2 hover:shadow-cyan-400/20 ${darkMode ? 'border-slate-800 bg-slate-900/70' : 'border-white/70 bg-white/80'}`} style={{ animationDelay: `${index * 90}ms` }}>
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="text-lg font-bold">{link.name}</p>
+                          <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>{link.handle}</p>
+                        </div>
+                        <span className="text-2xl transition group-hover:scale-125">{link.emoji}</span>
+                      </div>
+                      <div className="mt-4 h-1.5 w-0 rounded-full bg-gradient-to-r from-cyan-400 to-fuchsia-500 transition-all duration-300 group-hover:w-full" />
+                    </a>
+                  ))}
+                </div>
+              </section>
+
+              <section id="agenda" className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+                <div className={`rounded-[2rem] border p-6 shadow-xl glass ${darkMode ? 'border-slate-800 bg-slate-900/60' : 'border-white/70 bg-white/70'}`}>
+                  <p className="text-sm uppercase tracking-[0.3em] text-cyan-500">Calendario</p>
+                  <h3 className="mt-3 text-2xl font-black">Próximos eventos</h3>
+                  <div className="mt-6 space-y-4">
+                    {agenda.map((item) => (
+                      <div key={item.title} className={`rounded-2xl border p-4 transition hover:-translate-y-1 ${darkMode ? 'border-slate-700 bg-slate-800/70' : 'border-slate-200 bg-slate-50/80'}`}>
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <p className="font-semibold">{item.title}</p>
+                            <p className={`mt-1 text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>{item.detail}</p>
+                          </div>
+                          <div className="rounded-full bg-cyan-500/10 px-3 py-2 text-sm font-bold text-cyan-600 dark:text-cyan-300">{item.date}</div>
+                        </div>
+                        <p className={`mt-3 text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Hora: {item.time}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className={`rounded-[2rem] border p-6 shadow-xl glass ${darkMode ? 'border-slate-800 bg-gradient-to-br from-cyan-500/20 to-fuchsia-500/20' : 'border-white/70 bg-gradient-to-br from-cyan-500/20 to-fuchsia-500/20'}`}>
+                  <p className="text-sm uppercase tracking-[0.3em] text-fuchsia-500">Moments</p>
+                  <h3 className="mt-3 text-2xl font-black">Galería y highlights</h3>
+                  <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                    {gallery.map((item) => (
+                      <div key={item} className={`rounded-2xl border p-4 text-sm font-semibold shadow transition hover:scale-105 hover:shadow-xl ${darkMode ? 'border-slate-700 bg-slate-900/70' : 'border-white/70 bg-white/80'}`}>{item}</div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+                <div className={`rounded-[2rem] border p-6 shadow-xl glass ${darkMode ? 'border-slate-800 bg-slate-900/60' : 'border-white/70 bg-white/70'}`}>
+                  <p className="text-sm uppercase tracking-[0.3em] text-cyan-500">Testimonios</p>
+                  <h3 className="mt-3 text-2xl font-black">Lo que dicen quienes la ven</h3>
+                  <div className="mt-6 space-y-4">
+                    {testimonials.map((item) => (
+                      <div key={item.name} className={`rounded-2xl border p-4 ${darkMode ? 'border-slate-800 bg-slate-800/60' : 'border-slate-200 bg-slate-50/80'}`}>
+                        <p className="font-semibold">“{item.quote}”</p>
+                        <p className={`mt-2 text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>— {item.name}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className={`rounded-[2rem] border p-6 shadow-xl glass ${darkMode ? 'border-slate-800 bg-slate-900/60' : 'border-white/70 bg-white/70'}`}>
+                  <p className="text-sm uppercase tracking-[0.3em] text-fuchsia-500">FAQ</p>
+                  <h3 className="mt-3 text-2xl font-black">Preguntas rápidas</h3>
+                  <div className="mt-6 space-y-3">
+                    {faqItems.map((item) => (
+                      <details key={item.q} className={`rounded-2xl border p-4 ${darkMode ? 'border-slate-800 bg-slate-800/50' : 'border-slate-200 bg-slate-50/70'}`}>
+                        <summary className="cursor-pointer font-semibold">{item.q}</summary>
+                        <p className={`mt-2 text-sm leading-7 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>{item.a}</p>
+                      </details>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              <section id="contact" className={`rounded-[2rem] border p-6 shadow-xl glass ${darkMode ? 'border-slate-800 bg-slate-900/60' : 'border-white/70 bg-white/70'}`}>
+                <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+                  <div>
+                    <p className="text-sm uppercase tracking-[0.3em] text-cyan-500">Contacto</p>
+                    <h3 className="mt-3 text-2xl font-black">Haz que tu web siga creciendo</h3>
+                    <p className={`mt-4 text-base leading-8 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>Si quieres, la siguiente mejora puede ser un formulario real, un botón de donaciones, merch o un bloque de promociones para cada evento.</p>
+                  </div>
+                  <div className={`rounded-[1.5rem] border p-5 ${darkMode ? 'border-slate-800 bg-slate-800/70' : 'border-slate-200 bg-slate-50/80'}`}>
+                    <div className="grid gap-3">
+                      <input className={`rounded-2xl border px-4 py-3 ${darkMode ? 'border-slate-700 bg-slate-900 text-slate-100' : 'border-slate-200 bg-white text-slate-900'}`} placeholder="Tu nombre" />
+                      <input className={`rounded-2xl border px-4 py-3 ${darkMode ? 'border-slate-700 bg-slate-900 text-slate-100' : 'border-slate-200 bg-white text-slate-900'}`} placeholder="Tu email" />
+                      <textarea className={`min-h-28 rounded-2xl border px-4 py-3 ${darkMode ? 'border-slate-700 bg-slate-900 text-slate-100' : 'border-slate-200 bg-white text-slate-900'}`} placeholder="Cuéntame qué quieres añadir" />
+                      <button className="rounded-full bg-cyan-500 px-4 py-3 font-semibold text-slate-950 transition hover:-translate-y-1">Enviar propuesta</button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </main>
+
+            <footer className={`border-t px-6 py-8 text-center text-sm ${darkMode ? 'border-slate-800 text-slate-400' : 'border-white/40 text-slate-500'}`}>
+              Diseñado para Carraco con estilo, animaciones suaves, mucho contenido y una experiencia premium.
+            </footer>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+  </body>
+</html>
