@@ -14,7 +14,7 @@ export default function handler(req, res) {
 
   if (req.method === 'POST') {
     const { password, isLive, title, url } = req.body || {};
-    if (password !== 'carraco2026') {
+    if (password !== 'carrasco2026') {
       res.status(401).json({ error: 'No autorizado' });
       return;
     }
