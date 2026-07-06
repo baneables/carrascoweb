@@ -105,7 +105,7 @@
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                password: 'carraco2026',
+                password: 'carrasco2026',
                 ...payload,
               }),
             });
@@ -114,10 +114,10 @@
               throw new Error(serverState.error || 'No se pudo guardar el estado.');
             }
             setLiveStatus(serverState);
-            window.localStorage.setItem('carraco-live-status', JSON.stringify(serverState));
+            window.localStorage.setItem('carrasco-live-status', JSON.stringify(serverState));
           } catch (error) {
             setLiveStatus(payload);
-            window.localStorage.setItem('carraco-live-status', JSON.stringify(payload));
+            window.localStorage.setItem('carrasco-live-status', JSON.stringify(payload));
           }
         };
 
@@ -138,7 +138,7 @@
         };
 
         const unlockOwner = () => {
-          const correctPassword = 'carraco2026';
+          const correctPassword = 'carrasco2026';
           if (ownerPass === correctPassword) {
             setIsOwner(true);
             setAuthMessage('Acceso permitido.');
@@ -163,7 +163,7 @@
         }, []);
 
         useEffect(() => {
-          const savedConfig = window.localStorage.getItem('carraco-live-config');
+          const savedConfig = window.localStorage.getItem('carrasco-live-config');
           if (savedConfig) {
             try {
               setLiveConfig(JSON.parse(savedConfig));
@@ -172,7 +172,7 @@
             }
           }
 
-          const savedStatus = window.localStorage.getItem('carraco-live-status');
+          const savedStatus = window.localStorage.getItem('carrasco-live-status');
           if (savedStatus) {
             try {
               setLiveStatus(JSON.parse(savedStatus));
@@ -188,7 +188,7 @@
               const response = await fetch('/api/live');
               const serverState = await response.json();
               setLiveStatus(serverState);
-              window.localStorage.setItem('carraco-live-status', JSON.stringify(serverState));
+              window.localStorage.setItem('carrasco-live-status', JSON.stringify(serverState));
             } catch (error) {
               console.warn('No se pudo sincronizar el estado de directo.', error);
             }
@@ -223,7 +223,7 @@
         }, []);
 
         useEffect(() => {
-          window.localStorage.setItem('carraco-live-config', JSON.stringify(liveConfig));
+          window.localStorage.setItem('carrasco-live-config', JSON.stringify(liveConfig));
         }, [liveConfig]);
 
         const overlayStyle = useMemo(() => ({
@@ -237,7 +237,7 @@
             <div className="pointer-events-none fixed inset-0 z-0" style={overlayStyle} />
             <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 lg:px-8">
               <div>
-                <p className="text-sm uppercase tracking-[0.35em] text-cyan-500">Carraco</p>
+                <p className="text-sm uppercase tracking-[0.35em] text-cyan-500">carrasco</p>
                 <h1 className="text-2xl font-black sm:text-3xl">Tu universo, en una sola web</h1>
               </div>
               <button
@@ -252,7 +252,7 @@
               <section className={`grid items-center gap-8 rounded-[2rem] border p-8 shadow-2xl glass lg:grid-cols-[1.05fr_0.95fr] lg:p-10 ${darkMode ? 'border-slate-800 bg-slate-900/60' : 'border-white/70 bg-white/70'}`}>
                 <div className="space-y-6">
                   <span className="inline-block rounded-full bg-cyan-500/10 px-4 py-2 text-sm font-semibold text-cyan-600 dark:text-cyan-300">Creator • Eventos • Comunidad • Marca personal</span>
-                  <h2 className="text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">Una web mucho más grande, más premium y mucho más viva para Carraco.</h2>
+                  <h2 className="text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">Una web mucho más grande, más premium y mucho más viva para carrasco.</h2>
                   <p className={`max-w-2xl text-lg ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>Aquí se juntan tus redes, tus eventos, tus momentos, tus colaboraciones y tu comunidad en un espacio muy cuidado, con animaciones suaves y un diseño que se siente moderno desde el primer segundo.</p>
                   <div className="flex flex-wrap gap-3">
                     {highlights.map((item) => (
@@ -332,7 +332,7 @@
 
               <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
                 <div className={`rounded-[2rem] border p-6 shadow-xl glass ${darkMode ? 'border-slate-800 bg-slate-900/60' : 'border-white/70 bg-white/70'}`}>
-                  <p className="text-sm uppercase tracking-[0.3em] text-cyan-500">Sobre Carraco</p>
+                  <p className="text-sm uppercase tracking-[0.3em] text-cyan-500">Sobre carrasco</p>
                   <h3 className="mt-3 text-2xl font-black">Más que una cuenta: una marca con personalidad.</h3>
                   <p className={`mt-4 text-base leading-8 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>Esta web está pensada para que la gente lo vea como un universo completo: entretenimiento, ritmo, comunidad, eventos, premios y un estilo propio que se nota desde el primer clic.</p>
                   <div className="mt-6 grid gap-3">
@@ -362,7 +362,7 @@
               <section id="social" className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
                 <div className={`rounded-[2rem] border p-6 shadow-xl glass ${darkMode ? 'border-slate-800 bg-slate-900/60' : 'border-white/70 bg-white/70'}`}>
                   <p className="text-sm uppercase tracking-[0.3em] text-cyan-500">Redes</p>
-                  <h3 className="mt-3 text-2xl font-black">Conecta con Carraco</h3>
+                  <h3 className="mt-3 text-2xl font-black">Conecta con carrasco</h3>
                   <p className={`mt-3 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>Todas las redes en un mismo lugar, con un diseño más premium, más limpio y mucho más vivo.</p>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
