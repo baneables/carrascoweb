@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 
 const socialLinks = [
-  { name: 'YouTube', url: 'https://youtube.com', handle: '@carraco', emoji: '▶️' },
   { name: 'Twitch', url: 'hhttps://www.twitch.tv/twich_alecarrasco', handle: '@carraco', emoji: '📹' },
-  { name: 'TikTok', url: 'https://tiktok.com', handle: '@carraco', emoji: '🎵' },
+  { name: 'YouTube', url: 'https://youtube.com', handle: '@carraco', emoji: '▶️' },
+  {/*{ name: 'TikTok', url: 'https://tiktok.com', handle: '@carraco', emoji: '🎵' },*/}
   { name: 'Discord', url: 'https://discord.com', handle: 'Comunidad', emoji: '💬' },
 ];
 
 const highlights = [
   'Streaming en directo',
-  'Eventos exclusivos',
+  'Eventos',
   'Contenido de humor y retos',
   'Comunidad de +1k',
 ];
@@ -76,7 +76,7 @@ function App() {
               La web que une tu contenido, tus fans y tus próximos eventos.
             </h2>
             <p className="max-w-2xl text-lg text-slate-600 dark:text-slate-300">
-              Una experiencia premium, suave y dinámica para mostrar tu marca personal, tus redes y cada momento importante de tu universo.
+              El mejor streamer del mundo.
             </p>
             <div className="flex flex-wrap gap-3">
               {highlights.map((item) => (
