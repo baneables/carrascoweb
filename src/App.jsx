@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 
 const socialLinks = [
-  { name: 'Twitch', url: 'hhttps://www.twitch.tv/twich_alecarrasco', handle: '@carraco', emoji: '📹' },
-  { name: 'YouTube', url: 'https://youtube.com', handle: '@carraco', emoji: '▶️' },
-  {/*{ name: 'TikTok', url: 'https://tiktok.com', handle: '@carraco', emoji: '🎵' },*/}
+  { name: 'Twitch', url: 'hhttps://www.twitch.tv/twich_alecarrasco', handle: '@carrasco', emoji: '📹' },
+  { name: 'YouTube', url: 'https://youtube.com', handle: '@carrasco', emoji: '▶️' },
+  {/*{ name: 'TikTok', url: 'https://tiktok.com', handle: '@carrasco', emoji: '🎵' },*/}
   { name: 'Discord', url: 'https://discord.com', handle: 'Comunidad', emoji: '💬' },
 ];
 
@@ -55,8 +55,8 @@ function App() {
       <div className="pointer-events-none fixed inset-0 z-0 opacity-70" style={cursorStyle} />
       <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 lg:px-8">
         <div>
-          <p className="text-sm uppercase tracking-[0.35em] text-cyan-500">Carraco</p>
-          <h1 className="text-2xl font-black sm:text-3xl">Carraco Web</h1>
+          <p className="text-sm uppercase tracking-[0.35em] text-cyan-500">carrasco</p>
+          <h1 className="text-2xl font-black sm:text-3xl">carrasco Web</h1>
         </div>
         <button
           onClick={() => setDarkMode(!darkMode)}
@@ -100,7 +100,7 @@ function App() {
               <div className="mb-4 flex items-center justify-between">
                 <div>
                   <p className="text-sm uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Live ahora</p>
-                  <h3 className="text-xl font-bold">Carraco en directo</h3>
+                  <h3 className="text-xl font-bold">carrasco en directo</h3>
                 </div>
                 <div className="rounded-full bg-rose-500 px-3 py-1 text-sm font-semibold text-white">En vivo</div>
               </div>
@@ -116,7 +116,7 @@ function App() {
         <section id="social" className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
           <div className="rounded-[2rem] border border-white/60 bg-white/60 p-6 shadow-xl backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/60">
             <p className="text-sm uppercase tracking-[0.3em] text-cyan-500">Redes</p>
-            <h3 className="mt-3 text-2xl font-black">Conecta con Carraco</h3>
+            <h3 className="mt-3 text-2xl font-black">Conecta con carrasco</h3>
             <p className="mt-3 text-slate-600 dark:text-slate-300">Todos tus canales en un solo lugar, con estética elegante y navegación fluida.</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
@@ -173,7 +173,7 @@ function App() {
       </main>
 
       <footer className="border-t border-white/40 px-6 py-8 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
-        Diseñado con ❤️ para Carraco.
+        Diseñado con ❤️ para carrasco.
       </footer>
     </div>
   );
